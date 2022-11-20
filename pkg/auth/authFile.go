@@ -15,11 +15,13 @@ type AuthConfig struct {
 	Instance       string `json:"instance"`
 }
 
+// getConfigPath determines the path for the configuration file.
 func getConfigPath() (string, error) {
 	currentUser, err := user.Current()
 	return fmt.Sprintf("%v/.config/gotumble.json", currentUser.HomeDir), err
 }
 
+// LoadConfig loads an existing configuration file.
 func LoadConfig() (AuthConfig, error) {
 	var authInfo AuthConfig
 	configPath, err := getConfigPath()
@@ -36,6 +38,7 @@ func LoadConfig() (AuthConfig, error) {
 	return authInfo, err
 }
 
+// WriteConfig writes a new configuration file.
 func WriteConfig(config AuthConfig) (string, error) {
 	configPath, err := getConfigPath()
 	if err != nil {

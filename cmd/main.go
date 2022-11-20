@@ -8,11 +8,12 @@ import (
 
 	"github.com/jfabry-noc/GoTumble/pkg/auth"
 	"github.com/jfabry-noc/GoTumble/pkg/input"
+	"github.com/jfabry-noc/GoTumble/pkg/tumblr"
 )
 
 func main() {
-	// Need to have this check for a config file. If not found, prompt for details
-	// to create.
+	// Check for a config file. If not found, prompt for details to create.
+	var configuration auth.AuthConfig
 	for {
 		configuration, err := auth.LoadConfig()
 		if err != nil {
@@ -28,6 +29,18 @@ func main() {
 		fmt.Printf("Config loaded for: %v\n", configuration.Instance)
 		break
 	}
-	os.Exit(0)
 
+	// Instantiate a Tumblr Client from the library.
+	client := tumblr.CreateClient(
+		configuration.ConsumerKey,
+		configuration.ConsumerSecret,
+		configuration.Token,
+		configuration.TokenSecret,
+		configuration.Instance,
+	)
+
+	// Start the main loop.
+	selection := input.MainMenu(client.Blog)
+	fmt.Printf("Selected option: %v\n", selection)
+	os.Exit(0)
 }
