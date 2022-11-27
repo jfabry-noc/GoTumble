@@ -13,6 +13,7 @@ type AuthConfig struct {
 	Token          string `json:"token"`
 	TokenSecret    string `json:"token_secret"`
 	Instance       string `json:"instance"`
+	Format         string `json:"format"`
 }
 
 // getConfigPath determines the path for the configuration file.

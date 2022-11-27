@@ -11,17 +11,27 @@ import (
 	"github.com/jfabry-noc/GoTumble/pkg/tumblr"
 )
 
+const editorVar = "EDITOR"
+
+func loadEditor() string {
+	return os.Getenv(editorVar)
+}
+
 func main() {
 	// Check for a config file. If not found, prompt for details to create.
 	var configuration auth.AuthConfig
+	// This is a problem because configuration is NOT updated outside of the
+	// scope of this for loop. Meaning the call to configuration.Instance
+	// immediately after it returns the default of empty string for that value...
+	// Probably need another function that returns the solid values?
+	configuration, err := auth.LoadConfig()
 	for {
-		configuration, err := auth.LoadConfig()
 		if err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
 				fmt.Println("Config file not found.")
 				input.PromptConfig()
+				configuration, err = auth.LoadConfig()
 			} else {
-				fmt.Printf("Error type is: %T\n", err)
 				fmt.Printf("Error loading configuration: %v\n", err)
 				os.Exit(1)
 			}
@@ -40,7 +50,38 @@ func main() {
 	)
 
 	// Start the main loop.
-	selection := input.MainMenu(client.Blog)
-	fmt.Printf("Selected option: %v\n", selection)
-	os.Exit(0)
+	for {
+		menuChoice := input.MainMenu(client.Blog, loadEditor(), configuration.Format)
+		if menuChoice == 1 {
+			fmt.Println("Creating new post.")
+		} else if menuChoice == 2 {
+			fmt.Println("Updating blog selection.")
+			newBlogId := input.UpdateBlogSelection()
+			// Delete this later. Just leaving for the fmt import.
+			fmt.Printf("New blog: %v\n", newBlogId)
+			if client.VerifyBlog(newBlogId) {
+				// NEXT: Need to figure out how to write this to the config file
+				// along with having it update the current struct.
+				client.Blog = newBlogId
+				configuration.Instance = newBlogId
+				input.ConfigUpdate(configuration, false)
+			} else {
+				fmt.Printf("%v doesn't appear to be a valid blog ID for this account.\n", newBlogId)
+			}
+		} else if menuChoice == 3 {
+			if configuration.Format == "markdown" {
+				configuration.Format = "html"
+			} else if configuration.Format == "html" {
+				configuration.Format = "markdown"
+			}
+			input.ConfigUpdate(configuration, false)
+		} else if menuChoice == 4 {
+			fmt.Println("Overwriting the entire config file.")
+		} else if menuChoice == 5 {
+			input.UpdateEditorInstr()
+		} else {
+			fmt.Println("Goodbye!")
+			os.Exit(0)
+		}
+	}
 }
