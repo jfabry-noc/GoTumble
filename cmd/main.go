@@ -20,6 +20,10 @@ func loadEditor() string {
 func main() {
 	// Check for a config file. If not found, prompt for details to create.
 	var configuration auth.AuthConfig
+
+	// Instantiate an input controller for driving the menu system.
+	inputController := input.CreateController()
+
 	// This is a problem because configuration is NOT updated outside of the
 	// scope of this for loop. Meaning the call to configuration.Instance
 	// immediately after it returns the default of empty string for that value...
@@ -29,7 +33,7 @@ func main() {
 		if err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
 				fmt.Println("Config file not found.")
-				input.PromptConfig()
+				inputController.PromptConfig()
 				configuration, err = auth.LoadConfig()
 			} else {
 				fmt.Printf("Error loading configuration: %v\n", err)
@@ -51,12 +55,12 @@ func main() {
 
 	// Start the main loop.
 	for {
-		menuChoice := input.MainMenu(client.Blog, loadEditor(), configuration.Format)
+		menuChoice := inputController.MainMenu(client.Blog, loadEditor(), configuration.Format)
 		if menuChoice == 1 {
 			fmt.Println("Creating new post.")
 		} else if menuChoice == 2 {
 			fmt.Println("Updating blog selection.")
-			newBlogId := input.UpdateBlogSelection()
+			newBlogId := inputController.UpdateBlogSelection()
 			// Delete this later. Just leaving for the fmt import.
 			fmt.Printf("New blog: %v\n", newBlogId)
 			if client.VerifyBlog(newBlogId) {

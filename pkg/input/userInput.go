@@ -10,11 +10,21 @@ import (
 	"github.com/jfabry-noc/GoTumble/pkg/auth"
 )
 
+type InputController struct {
+	InputBuffer *bufio.Reader
+}
+
+func CreateController() InputController {
+	var controllerInstance InputController
+	controllerInstance.InputBuffer = bufio.NewReader(os.Stdin)
+	return controllerInstance
+}
+
 // getInput gathers user input from a prompt and returns the string sans newline.
-func getInput(message string, buffer *bufio.Reader) string {
+func (b *InputController) getInput(message string) string {
 	fmt.Println(message)
 	fmt.Print("> ")
-	userInput, err := buffer.ReadString('\n')
+	userInput, err := b.InputBuffer.ReadString('\n')
 	if err != nil {
 		fmt.Printf("Failed to retrieve input with error: %v\n", err)
 		os.Exit(1)
@@ -23,17 +33,16 @@ func getInput(message string, buffer *bufio.Reader) string {
 }
 
 // PromptConfig gets configuration details from the user.
-func PromptConfig() {
+func (b *InputController) PromptConfig() {
 	var config auth.AuthConfig
-	buffer := bufio.NewReader(os.Stdin)
 	fmt.Println("Please provide the following configuration information.")
 	fmt.Println("This will be written to: ~/.config/gotumble.json")
 
-	config.ConsumerKey = getInput("Consumer Key: ", buffer)
-	config.ConsumerSecret = getInput("Consumer Secret: ", buffer)
-	config.Token = getInput("Token: ", buffer)
-	config.TokenSecret = getInput("Token Secret: ", buffer)
-	config.Instance = getInput("Instance: ", buffer)
+	config.ConsumerKey = b.getInput("Consumer Key: ")
+	config.ConsumerSecret = b.getInput("Consumer Secret: ")
+	config.Token = b.getInput("Token: ")
+	config.TokenSecret = b.getInput("Token Secret: ")
+	config.Instance = b.getInput("Instance: ")
 
 	ConfigUpdate(config, true)
 }
@@ -61,14 +70,12 @@ func UpdateEditorInstr() {
 }
 
 // UpdateBlogSelection modifies the current blog used for posts.
-func UpdateBlogSelection() string {
-	buffer := bufio.NewReader(os.Stdin)
-	return getInput("Enter blog ID.", buffer)
+func (b *InputController) UpdateBlogSelection() string {
+	return b.getInput("Enter blog ID.")
 }
 
 // MainMenu prints the main menu and gets user input on where to navigate.
-func MainMenu(blogName string, editor string, format string) int {
-	buffer := bufio.NewReader(os.Stdin)
+func (b *InputController) MainMenu(blogName string, editor string, format string) int {
 	fmt.Printf("--== Posting to %v in %v with editor: %v ==--\n", blogName, format, editor)
 	fmt.Println("1. New post")
 	fmt.Println("2. Update blog selection")
@@ -81,7 +88,7 @@ func MainMenu(blogName string, editor string, format string) int {
 	var choiceInt int
 	var err error
 	for {
-		choice = getInput("What would you like to do?", buffer)
+		choice = b.getInput("What would you like to do?")
 		choiceInt, err = strconv.Atoi(choice)
 		if err != nil {
 			fmt.Printf("%v is not a valid choice. Please enter a number.\n", choice)
@@ -101,9 +108,8 @@ func MainMenu(blogName string, editor string, format string) int {
 }
 
 // UpdateFormat will prompt the user for the new post format (HTML or Markdown)
-func UpdateFormat() string {
-	buffer := bufio.NewReader(os.Stdin)
-	choice := getInput("Select if you'd like HTML or Markdown for your posts.", buffer)
+func (b *InputController) UpdateFormat() string {
+	choice := b.getInput("Select if you'd like HTML or Markdown for your posts.")
 
 	choiceLowered := strings.ToLower(choice)
 	for {
