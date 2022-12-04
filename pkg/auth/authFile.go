@@ -19,7 +19,7 @@ type AuthConfig struct {
 // getConfigPath determines the path for the configuration file.
 func getConfigPath() (string, error) {
 	currentUser, err := user.Current()
-	return fmt.Sprintf("%v/.config/gotumble.json", currentUser.HomeDir), err
+	return fmt.Sprintf("%v/.config/gotumble/config.json", currentUser.HomeDir), err
 }
 
 // LoadConfig loads an existing configuration file.

@@ -1,6 +1,9 @@
 package tumblr
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/tumblr/tumblrclient.go"
@@ -65,4 +68,29 @@ func cleanUrl(potentialUrl string) string {
 
 	return processed.Host
 
+}
+
+// AddPost adds a new post to the Tumblr account.
+func (c *TumblrClient) AddPost(content string, format string) error {
+	formData := url.Values{}
+	formData.Add("type", "text")
+	formData.Add("state", "published")
+	formData.Add("body", content)
+	formData.Add("format", format)
+	resp, err := c.Client.PostWithParams("blog/loopedapitester/post", formData)
+	if err != nil {
+		return err
+	}
+
+	var postResponse TumblrPostResp
+	postErr := json.Unmarshal(resp.GetBody(), &postResponse)
+	if postErr != nil {
+		return err
+	}
+
+	if postResponse.Meta.Status != 201 {
+		errorMessage := fmt.Sprintf("Tumblr response code was: %v", postResponse.Meta.Status)
+		return errors.New(errorMessage)
+	}
+	return nil
 }
