@@ -217,3 +217,12 @@ func (i *InputController) promptSecrets(secretName string) string {
 	message := fmt.Sprintf("Enter the value for the new: %v\n", secretName)
 	return i.getInput(message)
 }
+
+func (i *InputController) GetTags() string {
+	message := "Enter tags, if any, separated by commas."
+	rawTags := i.getInput(message)
+	if len(rawTags) > 0 {
+		return rawTags
+	}
+	return ""
+}
