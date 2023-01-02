@@ -67,7 +67,6 @@ func cleanUrl(potentialUrl string) string {
 	}
 
 	return processed.Host
-
 }
 
 // AddPost adds a new post to the Tumblr account.
@@ -77,9 +76,11 @@ func (c *TumblrClient) AddPost(content string, format string, tags string) error
 	formData.Add("state", "published")
 	formData.Add("body", content)
 	formData.Add("format", format)
+
 	if tags != "" {
 		formData.Add("tags", tags)
 	}
+
 	resp, err := c.Client.PostWithParams("blog/loopedapitester/post", formData)
 	if err != nil {
 		return err

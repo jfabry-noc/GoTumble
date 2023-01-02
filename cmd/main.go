@@ -80,7 +80,6 @@ func main() {
 		if menuChoice == 1 {
 			postContent, tempFile := inputController.CreatePost(configuration.Format, loadEditor())
 			if postContent != "" {
-				// TODO Get tags from the user to optionally include!
 				tags := inputController.GetTags()
 				postError := client.AddPost(postContent, configuration.Format, tags)
 				inputController.PostAftermath(postError, tempFile)

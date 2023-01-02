@@ -94,6 +94,7 @@ func (i *InputController) UpdateBlogSelection() string {
 
 // MainMenu prints the main menu and gets user input on where to navigate.
 func (i *InputController) MainMenu(blogName string, editor string, format string) int {
+	// TODO add options for text or image-based posts. Images would need caption, link, and source properties.
 	fmt.Printf("--== Posting to %v in %v with editor: %v ==--\n", blogName, format, editor)
 	fmt.Println("1. New post")
 	fmt.Println("2. Update blog selection")
