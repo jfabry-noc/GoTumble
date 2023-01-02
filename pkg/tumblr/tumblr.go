@@ -81,7 +81,8 @@ func (c *TumblrClient) AddPost(content string, format string, tags string) error
 		formData.Add("tags", tags)
 	}
 
-	resp, err := c.Client.PostWithParams("blog/loopedapitester/post", formData)
+	postPath := fmt.Sprintf("blog/%v/post", c.Blog)
+	resp, err := c.Client.PostWithParams(postPath, formData)
 	if err != nil {
 		return err
 	}
