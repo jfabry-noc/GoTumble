@@ -78,13 +78,22 @@ func main() {
 	for {
 		menuChoice := inputController.MainMenu(client.Blog, loadEditor(), configuration.Format)
 		if menuChoice == 1 {
-			postContent, tempFile := inputController.CreatePost(configuration.Format, loadEditor())
+			postContent, tempFile := inputController.CreateTextPost(configuration.Format, loadEditor())
 			if postContent != "" {
 				tags := inputController.GetTags()
-				postError := client.AddPost(postContent, configuration.Format, tags)
+				postError := client.AddTextPost(postContent, configuration.Format, tags)
 				inputController.PostAftermath(postError, tempFile)
 			}
 		} else if menuChoice == 2 {
+			link, postContent, tempFile := inputController.CreateLinkPost("html", loadEditor())
+			if link != "" {
+				tags := inputController.GetTags()
+				postError := client.AddLinkPost(postContent, link, "html", tags)
+				inputController.PostAftermath(postError, tempFile)
+			}
+		} else if menuChoice == 3 {
+			fmt.Println("Making a quote post.")
+		} else if menuChoice == 4 {
 			fmt.Println("Updating blog selection.")
 			newBlogId := inputController.UpdateBlogSelection()
 			fmt.Printf("New blog: %v\n", newBlogId)
@@ -95,10 +104,10 @@ func main() {
 			} else {
 				fmt.Printf("%v doesn't appear to be a valid blog ID for this account.\n", newBlogId)
 			}
-		} else if menuChoice == 3 {
+		} else if menuChoice == 5 {
 			configuration.Format = input.ToggleFormat(configuration.Format)
 			input.ConfigUpdate(configuration, false)
-		} else if menuChoice == 4 {
+		} else if menuChoice == 6 {
 			fmt.Println("Overwriting the entire config file.")
 			inputController.PromptConfig(configuration.Format)
 
@@ -113,7 +122,7 @@ func main() {
 				fmt.Printf("Blog of %v does not appear to be valid for this user.\n", configuration.Instance)
 				forceValidBlog(client, inputController, configuration)
 			}
-		} else if menuChoice == 5 {
+		} else if menuChoice == 7 {
 			input.UpdateEditorInstr()
 		} else {
 			fmt.Println("Goodbye!")

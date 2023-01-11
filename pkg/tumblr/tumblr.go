@@ -69,18 +69,7 @@ func cleanUrl(potentialUrl string) string {
 	return processed.Host
 }
 
-// AddPost adds a new post to the Tumblr account.
-func (c *TumblrClient) AddPost(content string, format string, tags string) error {
-	formData := url.Values{}
-	formData.Add("type", "text")
-	formData.Add("state", "published")
-	formData.Add("body", content)
-	formData.Add("format", format)
-
-	if tags != "" {
-		formData.Add("tags", tags)
-	}
-
+func (c *TumblrClient) addPost(formData url.Values, format string) error {
 	postPath := fmt.Sprintf("blog/%v/post", c.Blog)
 	resp, err := c.Client.PostWithParams(postPath, formData)
 	if err != nil {
@@ -98,4 +87,36 @@ func (c *TumblrClient) AddPost(content string, format string, tags string) error
 		return errors.New(errorMessage)
 	}
 	return nil
+}
+
+// AddTextPost adds a new post to the Tumblr account.
+func (c *TumblrClient) AddTextPost(content string, format string, tags string) error {
+	formData := url.Values{}
+	formData.Add("type", "text")
+	formData.Add("state", "published")
+	formData.Add("body", content)
+	formData.Add("format", format)
+
+	if tags != "" {
+		formData.Add("tags", tags)
+	}
+
+	return c.addPost(formData, format)
+}
+
+func (c *TumblrClient) AddLinkPost(description string, link string, format string, tags string) error {
+	formData := url.Values{}
+	formData.Add("type", "link")
+	formData.Add("state", "published")
+	formData.Add("url", link)
+
+	if description != "" {
+		formData.Add("description", description)
+	}
+
+	if tags != "" {
+		formData.Add("tags", tags)
+	}
+
+	return c.addPost(formData, format)
 }

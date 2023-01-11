@@ -3,6 +3,7 @@ package input
 import (
 	"bufio"
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -94,14 +95,15 @@ func (i *InputController) UpdateBlogSelection() string {
 
 // MainMenu prints the main menu and gets user input on where to navigate.
 func (i *InputController) MainMenu(blogName string, editor string, format string) int {
-	// TODO add options for text or image-based posts. Images would need caption, link, and source properties.
 	fmt.Printf("--== Posting to %v in %v with editor: %v ==--\n", blogName, format, editor)
-	fmt.Println("1. New post")
-	fmt.Println("2. Update blog selection")
-	fmt.Println("3. Toggle format (HTML or Markdown)")
-	fmt.Println("4. Overwrite config file")
-	fmt.Println("5. View editor instructions")
-	fmt.Println("6. Quit")
+	fmt.Println("1. New text post")
+	fmt.Println("2. New link post")
+	fmt.Println("3. New quote post.")
+	fmt.Println("4. Update blog selection")
+	fmt.Println("5. Toggle format (HTML or Markdown)")
+	fmt.Println("6. Overwrite config file")
+	fmt.Println("7. View editor instructions")
+	fmt.Println("8. Quit")
 
 	var choice string
 	var choiceInt int
@@ -114,7 +116,7 @@ func (i *InputController) MainMenu(blogName string, editor string, format string
 			continue
 		}
 
-		if choiceInt < 1 || choiceInt > 6 {
+		if choiceInt < 1 || choiceInt > 8 {
 			fmt.Printf("%v is not a valid choice. Please select from the options above.\n", choiceInt)
 			continue
 		}
@@ -152,8 +154,8 @@ func (i *InputController) getInputChoice(message string, first string, second st
 	}
 }
 
-// CreatePost Kicks off the post-creation process.
-func (i *InputController) CreatePost(postFormat string, editorPath string) (string, string) {
+// getPostContent Gets the content from the user for any text-based post.
+func (i *InputController) getPostContent(postFormat string, editorPath string) (string, string) {
 	tempFilePath := postfile.PostFilePath(postFormat)
 	for {
 		fmt.Printf("Opening temp file at '%v' with editor '%v'...\n", tempFilePath, editorPath)
@@ -196,6 +198,45 @@ func (i *InputController) CreatePost(postFormat string, editorPath string) (stri
 			return "", tempFilePath
 		}
 	}
+}
+
+// CreateTextPost Wrapper function to just get text post content.
+func (i *InputController) CreateTextPost(postFormat string, editorPath string) (string, string) {
+	content, file := i.getPostContent(postFormat, editorPath)
+
+	return content, file
+}
+
+// validateUrl Checks if a URL is valid. If not, an error is returned.
+func validateUrl(link string) error {
+	_, err := url.ParseRequestURI(link)
+
+	return err
+}
+
+// CreateLinkPost Wrapper function to get a URL and optional description for a link.
+func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (string, string, string) {
+	fmt.Println("Remember that link descriptions can only be HTML, not Markdown!")
+	var link string
+	for {
+		link := i.getInput("Enter the URL to share.")
+
+		if strings.ToLower(link) == "q" {
+			return "", "", ""
+		}
+
+		err := validateUrl(link)
+
+		if err == nil {
+			break
+		} else {
+			fmt.Printf("%v was not a valid URL. Try again or enter 'Q' to quit.\n", link)
+		}
+	}
+	content, file := i.getPostContent(postFormat, editorPath)
+
+	return link, content, file
+
 }
 
 // PostAftermath prints if a post was successful and cleans up the temporary file.
