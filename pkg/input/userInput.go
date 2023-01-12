@@ -36,6 +36,10 @@ func (i *InputController) getInput(message string) string {
 	return strings.Trim(userInput, "\n")
 }
 
+func (i *InputController) Printer(message string) {
+	fmt.Println(message)
+}
+
 func ToggleFormat(currentFormat string) string {
 	if currentFormat == "html" {
 		return "markdown"
@@ -233,7 +237,7 @@ func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (
 	fmt.Println("Remember that link descriptions can only be HTML, not Markdown!")
 	var link string
 	for {
-		link := i.getInput("Enter the URL to share.")
+		link = i.getInput("Enter the URL to share.")
 
 		if strings.ToLower(link) == "q" {
 			return "", "", ""
