@@ -82,17 +82,23 @@ func main() {
 			if postContent != "" {
 				tags := inputController.GetTags()
 				postError := client.AddTextPost(postContent, configuration.Format, tags)
-				inputController.PostAftermath(postError, tempFile)
+				inputController.PostAftermath(postError, []string{tempFile})
 			}
 		} else if menuChoice == 2 {
 			link, postContent, tempFile := inputController.CreateLinkPost("html", loadEditor())
 			if link != "" {
 				tags := inputController.GetTags()
 				postError := client.AddLinkPost(postContent, link, "html", tags)
-				inputController.PostAftermath(postError, tempFile)
+				inputController.PostAftermath(postError, []string{tempFile})
 			}
 		} else if menuChoice == 3 {
 			fmt.Println("Making a quote post.")
+			quote, source, quoteTempFile, sourceTempFile := inputController.CreateQuotePost("html", loadEditor())
+			if quote != "" {
+				tags := inputController.GetTags()
+				postErr := client.AddQuotePost(quote, source, "html", tags)
+				inputController.PostAftermath(postErr, []string{quoteTempFile, sourceTempFile})
+			}
 		} else if menuChoice == 4 {
 			fmt.Println("Updating blog selection.")
 			newBlogId := inputController.UpdateBlogSelection()

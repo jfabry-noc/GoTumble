@@ -104,6 +104,7 @@ func (c *TumblrClient) AddTextPost(content string, format string, tags string) e
 	return c.addPost(formData, format)
 }
 
+// AddLinkPost Wrapper for creating a new Link post.
 func (c *TumblrClient) AddLinkPost(description string, link string, format string, tags string) error {
 	formData := url.Values{}
 	formData.Add("type", "link")
@@ -112,6 +113,23 @@ func (c *TumblrClient) AddLinkPost(description string, link string, format strin
 
 	if description != "" {
 		formData.Add("description", description)
+	}
+
+	if tags != "" {
+		formData.Add("tags", tags)
+	}
+
+	return c.addPost(formData, format)
+}
+
+func (c *TumblrClient) AddQuotePost(quote string, source string, format string, tags string) error {
+	formData := url.Values{}
+	formData.Add("type", "quote")
+	formData.Add("state", "published")
+	formData.Add("quote", quote)
+
+	if source != "" {
+		formData.Add("source", source)
 	}
 
 	if tags != "" {

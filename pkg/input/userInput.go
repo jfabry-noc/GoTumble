@@ -207,6 +207,20 @@ func (i *InputController) CreateTextPost(postFormat string, editorPath string) (
 	return content, file
 }
 
+func (i *InputController) CreateQuotePost(postFormat string, editorPath string) (string, string, string, string) {
+	fmt.Println("Remember that quotes and their sources can only be HTML, not Markdown!")
+	fmt.Println("Enter the quote first into the file.")
+	fmt.Print("Enter to continue...")
+	_, _ = i.InputBuffer.ReadString('\n')
+	quote, quoteFile := i.getPostContent(postFormat, editorPath)
+
+	fmt.Println("Enter the source, if any, into this file.")
+	fmt.Print("Enter to continue...")
+	source, sourceFile := i.getPostContent(postFormat, editorPath)
+
+	return quote, source, quoteFile, sourceFile
+}
+
 // validateUrl Checks if a URL is valid. If not, an error is returned.
 func validateUrl(link string) error {
 	_, err := url.ParseRequestURI(link)
@@ -240,17 +254,19 @@ func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (
 }
 
 // PostAftermath prints if a post was successful and cleans up the temporary file.
-func (i *InputController) PostAftermath(err error, filePath string) {
+func (i *InputController) PostAftermath(err error, filePaths []string) {
 	if err != nil {
 		fmt.Printf("Failed to create post with error: %v\n", err)
 	} else {
 		fmt.Println("Post added successfully!")
 	}
 
-	fmt.Printf("Cleaning up temporary file at: %v\n", filePath)
-	err = postfile.DeleteFile(filePath)
-	if err != nil {
-		fmt.Printf("Failed to delete temporary file with error: %v\n", err)
+	for _, filePath := range filePaths {
+		fmt.Printf("Cleaning up temporary file at: %v\n", filePath)
+		err = postfile.DeleteFile(filePath)
+		if err != nil {
+			fmt.Printf("Failed to delete temporary file with error: %v\n", err)
+		}
 	}
 }
 
