@@ -122,6 +122,23 @@ func (c *TumblrClient) AddLinkPost(description string, link string, format strin
 	return c.addPost(formData, format)
 }
 
+func (c *TumblrClient) AddVideoPost(caption string, link string, format string, tags string) error {
+	formData := url.Values{}
+	formData.Add("type", "video")
+	formData.Add("state", "published")
+	formData.Add("embed", link)
+
+	if caption != "" {
+		formData.Add("caption", caption)
+	}
+
+	if tags != "" {
+		formData.Add("tags", tags)
+	}
+
+	return c.addPost(formData, format)
+}
+
 func (c *TumblrClient) AddQuotePost(quote string, source string, format string, tags string) error {
 	formData := url.Values{}
 	formData.Add("type", "quote")

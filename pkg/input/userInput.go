@@ -102,12 +102,13 @@ func (i *InputController) MainMenu(blogName string, editor string, format string
 	fmt.Printf("--== Posting to %v in %v with editor: %v ==--\n", blogName, format, editor)
 	fmt.Println("1. New text post")
 	fmt.Println("2. New link post")
-	fmt.Println("3. New quote post.")
-	fmt.Println("4. Update blog selection")
-	fmt.Println("5. Toggle format (HTML or Markdown)")
-	fmt.Println("6. Overwrite config file")
-	fmt.Println("7. View editor instructions")
-	fmt.Println("8. Quit")
+	fmt.Println("3. New video post.")
+	fmt.Println("4. New quote post.")
+	fmt.Println("5. Update blog selection")
+	fmt.Println("6. Toggle format (HTML or Markdown)")
+	fmt.Println("7. Overwrite config file")
+	fmt.Println("8. View editor instructions")
+	fmt.Println("9. Quit")
 
 	var choice string
 	var choiceInt int
@@ -120,7 +121,7 @@ func (i *InputController) MainMenu(blogName string, editor string, format string
 			continue
 		}
 
-		if choiceInt < 1 || choiceInt > 8 {
+		if choiceInt < 1 || choiceInt > 9 {
 			fmt.Printf("%v is not a valid choice. Please select from the options above.\n", choiceInt)
 			continue
 		}
@@ -232,15 +233,29 @@ func validateUrl(link string) error {
 	return err
 }
 
-// CreateLinkPost Wrapper function to get a URL and optional description for a link.
-func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (string, string, string) {
-	fmt.Println("Remember that link descriptions can only be HTML, not Markdown!")
+// CreateVideoPost Wrapper method to get a URL for a video and optional caption.
+func (i *InputController) CreateVideoPost(postFormat string, editorPath string) (string, string, string) {
+	// Not sure if this is true... test it.
+	fmt.Println("Remember that video captions can only be HTML, not Markdown!")
+	link := i.getUrl("Enter video URI to share.")
+	if link == "" {
+		return "", "", ""
+	}
+
+	content, file := i.getPostContent(postFormat, editorPath)
+
+	return link, content, file
+
+}
+
+// getUrl Gathers a valid URL from the user or Q to quit.
+func (i *InputController) getUrl(message string) string {
 	var link string
 	for {
-		link = i.getInput("Enter the URL to share.")
+		link = i.getInput(message)
 
 		if strings.ToLower(link) == "q" {
-			return "", "", ""
+			return ""
 		}
 
 		err := validateUrl(link)
@@ -251,10 +266,38 @@ func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (
 			fmt.Printf("%v was not a valid URL. Try again or enter 'Q' to quit.\n", link)
 		}
 	}
+
+	return link
+}
+
+// CreateLinkPost Wrapper function to get a URL and optional description for a link.
+func (i *InputController) CreateLinkPost(postFormat string, editorPath string) (string, string, string) {
+	fmt.Println("Remember that link descriptions can only be HTML, not Markdown!")
+	link := i.getUrl("Enter the URL to share.")
+	if link == "" {
+		return "", "", ""
+	}
+	/*
+		var link string
+		for {
+			link = i.getInput("Enter the URL to share.")
+
+			if strings.ToLower(link) == "q" {
+				return "", "", ""
+			}
+
+			err := validateUrl(link)
+
+			if err == nil {
+				break
+			} else {
+				fmt.Printf("%v was not a valid URL. Try again or enter 'Q' to quit.\n", link)
+			}
+		}
+	*/
 	content, file := i.getPostContent(postFormat, editorPath)
 
 	return link, content, file
-
 }
 
 // PostAftermath prints if a post was successful and cleans up the temporary file.

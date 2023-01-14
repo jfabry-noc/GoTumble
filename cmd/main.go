@@ -96,6 +96,16 @@ func main() {
 				inputController.Printer("Skipping due to empty link.")
 			}
 		} else if menuChoice == 3 {
+			fmt.Println("Creating a new video post.")
+			link, postContent, tempFile := inputController.CreateVideoPost("html", loadEditor())
+			if link != "" {
+				tags := inputController.GetTags()
+				postError := client.AddVideoPost(postContent, link, "html", tags)
+				inputController.PostAftermath(postError, []string{tempFile})
+			} else {
+				inputController.Printer("Skipping due to empty URI.")
+			}
+		} else if menuChoice == 4 {
 			quote, source, quoteTempFile, sourceTempFile := inputController.CreateQuotePost("html", loadEditor())
 			if quote != "" {
 				tags := inputController.GetTags()
