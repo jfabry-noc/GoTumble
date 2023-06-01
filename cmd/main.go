@@ -114,7 +114,7 @@ func main() {
 			} else {
 				inputController.Printer("Skipping due to empty quote.")
 			}
-		} else if menuChoice == 4 {
+		} else if menuChoice == 5 {
 			fmt.Println("Updating blog selection.")
 			newBlogId := inputController.UpdateBlogSelection()
 			fmt.Printf("New blog: %v\n", newBlogId)
@@ -125,10 +125,10 @@ func main() {
 			} else {
 				fmt.Printf("%v doesn't appear to be a valid blog ID for this account.\n", newBlogId)
 			}
-		} else if menuChoice == 5 {
+		} else if menuChoice == 6 {
 			configuration.Format = input.ToggleFormat(configuration.Format)
 			input.ConfigUpdate(configuration, false)
-		} else if menuChoice == 6 {
+		} else if menuChoice == 7 {
 			fmt.Println("Overwriting the entire config file.")
 			inputController.PromptConfig(configuration.Format)
 
@@ -143,7 +143,7 @@ func main() {
 				fmt.Printf("Blog of %v does not appear to be valid for this user.\n", configuration.Instance)
 				forceValidBlog(client, inputController, configuration)
 			}
-		} else if menuChoice == 7 {
+		} else if menuChoice == 8 {
 			input.UpdateEditorInstr()
 		} else {
 			fmt.Println("Goodbye!")
